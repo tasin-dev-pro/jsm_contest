@@ -20,5 +20,18 @@ app.get("/getFoods", async (req, res) => {
     res.json(foods);
 })
 
+app.put("/updateFoods/:id", async(req,res)=>{
+    const foodupdate =await Food.findByIdAndUpdate(req.params.id,req.body,{new:true});
+    res.json(foodupdate);    
+})
+
+
+app.delete("/deleteFoods/:id", async(req,res)=>{
+    const foodupdate =await Food.findByIdAndDelete(req.params.id,req.body);
+    res.json(foodupdate);    
+})
+
+
+
 
 app.listen(3000)
