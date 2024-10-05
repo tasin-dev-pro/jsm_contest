@@ -2,7 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import Food from "./models/Food.js";
-
+import Restaurant from "./models/Restaurant.js";
 const app = express();
 
 app.use(cookieParser())
@@ -60,7 +60,7 @@ app.delete("/deleteFoods/:id", async(req,res)=>{
 // Retaurant Crud Operations
 app.post("/createRetaurant", async (req, res) => {
     const { name, rating , location } = req.body;
-    const restaurantDoc = await Restaurant.create({ name , rating , location }) ;
+    const restaurantDoc = await    Restaurant.create({ name , rating , location }) ;
     res.json(restaurantDoc);
 }) 
 
