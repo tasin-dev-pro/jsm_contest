@@ -33,6 +33,9 @@ app.get("/getFoods", async (req, res) => {
     const foods = await Food.find();
     res.json(foods);
 })
+app.get("/", (req,res) => {
+    res.send("hello guys server is running!!!")
+})
 app.post('/register', async (req, res) => {
     const {username, email, password} = req.body
     try {
