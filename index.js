@@ -19,7 +19,7 @@ const secret = 'hgtye823etudgwetr6tgw7e386tr4';
 app.use(express.json());
 app.use(cors({
     credentials: true,
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:5173"],
 }));
 
 mongoose.connect("mongodb+srv://r11137307:todo_myapp@todo.8yhhs.mongodb.net/?retryWrites=true&w=majority&appName=todo");
@@ -33,25 +33,45 @@ app.get("/getFoods", async (req, res) => {
     const foods = await Food.find();
     res.json(foods);
 })
-app.post("/register", async (req, res) => {
-    const { username, password, email, role } = req.body;
-    const hashedPassword = await bcrypt.hash(password, salt);
-    const userDoc = await UserOfJSM.create({ username, password: hashedPassword, email, role });
-    res.json(userDoc);
-})
-
-app.post("/login", async (req, res) => {
-    const {email, password} = req.body;
-    const userDoc = await UserOfJSM.findOne({email});
-    const passOk = await bcrypt.compareSync(password, userDoc.password)
-    if(passOk){
-        jwt.sign({email: userDoc.email, id: userDoc.id}, secret, {}, (err, token) => {
-            if(err) throw err
-            res.cookie('token', token).json("success")
+app.post('/register', async (req, res) => {
+    const {username, email, password} = req.body
+    try {
+        const userDoc = await UserOfJSM.create({
+            username,email,password:bcrypt.hashSync(password, salt),
         })
+        res.send(userDoc)
+    } catch (error) {
+        res.status(400).json(error)
     }
+
 })
 
+app.post('/login', async (req, res) => {
+    const {email, password} = req.body
+    const userDoc = await UserOfJSM.findOne({email})
+    const passOk = bcrypt.compareSync(password, userDoc.password)
+    if(passOk) {
+        //logged in
+        jwt.sign({email: userDoc.email, id: userDoc._id},  secret, {}, (err, token) => {
+            if(err) throw err
+            res.cookie('token', token).json({
+                id: userDoc._id,
+                email: userDoc.email,
+            })
+        } )
+
+    } else {
+        res.status(401).json({msg: 'Invalid credentials'}, )
+    }
+
+})
+app.get('/profile', (req, res) => {
+    const {token} = req.cookies;
+    jwt.verify(token, secret, {}, (err, info) => {
+        if(err) throw err
+        res.json(info)
+    })
+})
 app.put("/updateFoods/:id", async(req,res)=>{
     const foodupdate =await Food.findByIdAndUpdate(req.params.id,req.body,{new:true});
     res.json(foodupdate);
@@ -71,7 +91,9 @@ app.post("/createRetaurant", async (req, res) => {
     res.json(restaurantDoc);
 })
 
-
+app.post('/logout', (req, res) => {
+    res.cookie('token', '').json('ok')
+})
 
 app.listen(3001, async () => {
     console.log("running on port 3001");
