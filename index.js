@@ -19,7 +19,7 @@ const secret = 'hgtye823etudgwetr6tgw7e386tr4';
 app.use(express.json());
 app.use(cors({
     credentials: true,
-    origin: ["http://localhost:5173"],
+    origin: ["http://localhost:5173", "https://jsm-contest-fr-1.vercel.app"],
 }));
 
 mongoose.connect("mongodb+srv://r11137307:todo_myapp@todo.8yhhs.mongodb.net/?retryWrites=true&w=majority&appName=todo");
