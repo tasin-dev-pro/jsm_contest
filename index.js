@@ -89,14 +89,20 @@ app.delete("/deleteFoods/:id", async(req,res)=>{
 
 // Retaurant Crud Operations
 app.post("/createRetaurant", async (req, res) => {
-    const { name, rating , location } = req.body;
-    const restaurantDoc = await    Restaurant.create({ name , rating , location }) ;
+    const { description, address, contact, image_url, } = req.body;
+    const restaurantDoc = await    Restaurant.create({ description: description, address: address, contact: contact, image_url: image_url }); ;
     res.json(restaurantDoc);
+})
+app.get("/getRetaurants", async (req, res) => {
+    const restaurants = await Restaurant.find();
+    res.json(restaurants);
 })
 
 app.post('/logout', (req, res) => {
     res.cookie('token', '').json('ok')
 })
+
+app.get('/')
 
 app.listen(3001, async () => {
     console.log("running on port 3001");

@@ -1,31 +1,30 @@
 import mongoose from "mongoose";
-import Food from "./Food.js";
-const RestaurantSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
+const restaurantSchema = new mongoose.Schema({
+  description: {
+    type: String,
+    required: true
+  },
+  address: {
+    type: String,
+    required: true
+  },
+  contact: {
+    phone: {
+      type: String,
+      required: true
     },
-    rating: {
-        type: Number
-    },
-    location: {
-     type: String ,
-    },
-    // availableFoods: [Food]
-//     cabins: [{
-//         totalCabins: {
-//             type: Number,
-//         },
-//         class: {
-//             type: String,
-//             enum: ["regular", "vip", "public", "private"],
-//             default: "regular",
-//         },
-//         isBooked: {
-//             type: Boolean,
-//             default: false
-//         }
-// }]
+    email: {
+      type: String,
+      required: true
+    }
+  },
+  image_url: {
+    type: String,
+    required: true
+  }
 });
-const Restaurant  = mongoose.model("Restaurant", RestaurantSchema);
-export default Restaurant;
+
+// Create the model
+const Restaurant = mongoose.model('Restaurant', restaurantSchema);
+
+export default Restaurant
