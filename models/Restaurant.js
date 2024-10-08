@@ -21,7 +21,8 @@ const restaurantSchema = new mongoose.Schema({
   image_url: {
     type: String,
     required: true
-  }
+  },
+  
 });
 
 // Create the model

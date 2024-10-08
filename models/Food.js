@@ -13,6 +13,10 @@ const FoodSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
+    dishType: {
+        type: String,
+        required: true
+    }
 });
 
 const Food = mongoose.model("Food", FoodSchema);

@@ -20,6 +20,14 @@ const UsersSchemaOfJsm  = new Schema({
         role: ['user', 'admin'],
         default: 'user',
     },
+    cartItems: {
+        type: Array,
+        default: [],
+    },
+    bio: {
+        type: String,
+        default: 'bio not added',
+    },
 
 })
 
