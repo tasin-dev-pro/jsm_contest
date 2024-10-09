@@ -79,7 +79,7 @@ const findUserByEmail = async (email) => {
     return await UserOfJSM.findOne({ email:email });
   };
 const findUserByEmailAndUpdate = async (email, data) => {
-    return await UserOfJSM.findOneAndUpdate({ email }, {data});
+    return await UserOfJSM.findOneAndUpdate({ email }, {data}, {new: true});
   };
 app.get("/getProfile/:email", async(req, res) => {
     const userDoc = await findUserByEmail(req.params.email);
