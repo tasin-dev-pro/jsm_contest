@@ -78,12 +78,19 @@ app.get('/profile', (req, res) => {
 const findUserByEmail = async (email) => {
     return await UserOfJSM.findOne({ email:email });
   };
+const findUserByEmailAndUpdate = async (email, data) => {
+    return await UserOfJSM.findOneAndUpdate({ email }, {data});
+  };
 app.get("/getProfile/:email", async(req, res) => {
     const userDoc = await findUserByEmail(req.params.email);
     res.json(userDoc);
 })
 app.put("/updateFoods/:id", async(req,res)=>{
     const foodupdate =await Food.findByIdAndUpdate(req.params.id,req.body,{new:true});
+    res.json(foodupdate);
+})
+app.put("/updateUser/:email", async(req,res)=>{
+    const foodupdate =await findUserByEmailAndUpdate(req.params.email,req.body);
     res.json(foodupdate);
 })
 
