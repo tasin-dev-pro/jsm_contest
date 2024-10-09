@@ -75,6 +75,13 @@ app.get('/profile', (req, res) => {
         res.json(info)
     })
 })
+const findUserByEmail = async (email) => {
+    return await UserOfJSM.findOne({ email:email });
+  };
+app.get("/getProfile/:email", async(req, res) => {
+    const userDoc = await findUserByEmail(req.params.email);
+    res.json(userDoc);
+})
 app.put("/updateFoods/:id", async(req,res)=>{
     const foodupdate =await Food.findByIdAndUpdate(req.params.id,req.body,{new:true});
     res.json(foodupdate);
