@@ -90,7 +90,7 @@ app.put("/updateFoods/:id", async(req,res)=>{
     res.json(foodupdate);
 })
 app.put("/updateUser/:email", async(req,res)=>{
-    const foodupdate =await UserOfJSM.findOneAndUpdate(req.params.email,req.body);
+    const foodupdate =await UserOfJSM.findOneAndUpdate(req.params.email,req.body, {new:true});
     res.json(foodupdate);
 })
 
