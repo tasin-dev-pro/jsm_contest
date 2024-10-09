@@ -5,6 +5,7 @@ import Food from "./models/Food.js";
 import Restaurant from "./models/Restaurant.js";
 import cookieParser from "cookie-parser";
 import bcrypt from "bcryptjs/dist/bcrypt.js";
+import { v2 as cloudinary } from 'cloudinary';
 import UserOfJSM from "./models/User.js";
 import jwt from "jsonwebtoken";
 const app = express();
@@ -21,8 +22,25 @@ app.use(cors({
     credentials: true,
     origin: ["http://localhost:5173","http://localhost:5174", "https://jsm-contest-fr-1.vercel.app"],
 }));
-
 mongoose.connect("mongodb+srv://r11137307:todo_myapp@todo.8yhhs.mongodb.net/?retryWrites=true&w=majority&appName=todo");
+
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+app.delete('/deleteImage', async (req, res) => {
+  const { public_id } = req.body; // public_id of the image to delete
+  try {
+    const result = await cloudinary.uploader.destroy(public_id);
+    res.json({ message: 'Image deleted successfully', result });
+  } catch (error) {
+    console.error('Error deleting image:', error);
+    res.status(500).json({ message: 'Failed to delete image', error });
+  }
+});
 
 app.post("/createFood", async (req, res) => {
     const { name, description, price } = req.body;
