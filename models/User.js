@@ -30,10 +30,11 @@ const UsersSchemaOfJsm = new Schema({
     type: String,
     default: null, // Store Cloudinary public_id for easier deletion
   },
-  cartItems: {
-    type: Array,
-    default: [],
-  },
+cartItems: [{
+    productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Food' }, // Example for food items
+    quantity: { type: Number, required: true },
+  }],
+
   bio: {
     type: String,
     default: 'bio not added',

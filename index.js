@@ -136,7 +136,47 @@ app.post('/logout', (req, res) => {
     res.cookie('token', '').json('ok')
 })
 
-app.get('/')
+//cart crud operations
+app.post("/cart/add", async (req, res) => {
+    const { email, productId, quantity } = req.body;
+
+    try {
+        // Find user by email
+        const user = await UserOfJSM.findOne({ email });
+
+        // Check if item is already in cart
+        const itemIndex = user.cartItems.findIndex(item => item.productId == productId);
+
+        if (itemIndex > -1) {
+            // If item exists in the cart, update its quantity
+            user.cartItems[itemIndex].quantity += quantity;
+        } else {
+            // If item does not exist, add it to cart
+            user.cartItems.push({ productId, quantity });
+        }
+
+        // Save user with updated cart
+        await user.save();
+
+        res.json({ message: "Item added to cart", cartItems: user.cartItems });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to add item to cart", details: error });
+    }
+});
+app.get("/cart/:email", async (req, res) => {
+    const { email } = req.params;
+
+    try {
+        // Find user by email
+        const user = await UserOfJSM.findOne({ email }).populate('cartItems.productId'); // Optional: populate product details
+
+        res.json({ cartItems: user.cartItems });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to retrieve cart", details: error });
+    }
+});
+
+
 
 app.listen(3001, async () => {
     console.log("running on port 3001");
