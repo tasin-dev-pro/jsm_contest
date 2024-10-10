@@ -176,6 +176,26 @@ app.get("/cart/:email", async (req, res) => {
     }
 });
 
+app.delete("/cart/remove", async (req, res) => {
+    const { email, productId } = req.body;
+
+    try {
+        // Find user by email
+        const user = await UserOfJSM.findOne({ email });
+
+        // Filter out the item to remove from the cart
+        user.cartItems = user.cartItems.filter(item => item.productId != productId);
+
+        // Save the updated user
+        await user.save();
+
+        res.json({ message: "Item removed from cart", cartItems: user.cartItems });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to remove item from cart", details: error });
+    }
+});
+
+
 
 
 app.listen(3001, async () => {
