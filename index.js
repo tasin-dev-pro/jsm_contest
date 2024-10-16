@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import bcrypt from "bcryptjs/dist/bcrypt.js";
 import { v2 as cloudinary } from 'cloudinary';
 import UserOfJSM from "./models/User.js";
+import Order from "./models/OrderSchema.js";
 import jwt from "jsonwebtoken";
 const app = express();
 
@@ -280,6 +281,24 @@ app.post("/order/create", async (req, res) => {
       res.status(500).json({ error: "Failed to delete order", details: error });
     }
   });
+
+  // Cancel an order
+app.put("/order/:orderId/cancel", async (req, res) => {
+    const { orderId } = req.params;
+
+    try {
+        // Find the order by its ID
+        const order = await Order.findByIdAndUpdate(orderId, { status: 'Canceled' }, { new: true });
+
+        if (!order) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+
+        res.json({ message: "Order canceled successfully", order });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to cancel order", details: error });
+    }
+});
 
 
 
