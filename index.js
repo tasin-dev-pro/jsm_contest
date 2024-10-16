@@ -73,13 +73,14 @@ app.post('/login', async (req, res) => {
     const passOk = bcrypt.compareSync(password, userDoc.password)
     if(passOk) {
         //logged in
-        jwt.sign({email: userDoc.email, id: userDoc._id},  secret, {}, (err, token) => {
-            if(err) throw err
-            res.cookie('token', token).json({
-                id: userDoc._id,
-                email: userDoc.email,
-            })
-        } )
+        jwt.sign({ email: userDoc.email, id: userDoc._id }, secret, { expiresIn: '1d' }, (err, token) => {
+    if (err) throw err;
+    res.cookie('token', token).json({
+        id: userDoc._id,
+        email: userDoc.email,
+    });
+});
+
 
     } else {
         res.status(401).json({msg: 'Invalid credentials'}, )
