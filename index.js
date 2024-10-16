@@ -196,6 +196,92 @@ app.delete("/cart/remove", async (req, res) => {
     }
 });
 
+app.post("/order/create", async (req, res) => {
+    const { email } = req.body;
+
+    try {
+      // Find the user by their email
+      const user = await UserOfJSM.findOne({ email }).populate('cartItems.productId');
+
+      if (!user || user.cartItems.length === 0) {
+        return res.status(404).json({ message: "No items in cart or user not found" });
+      }
+
+      // Calculate total price from cart items
+      const totalPrice = user.cartItems.reduce((sum, item) => {
+        return sum + (item.productId.price * item.quantity);
+      }, 0);
+
+      // Create a new order
+      const newOrder = await Order.create({
+        user: user._id,
+        items: user.cartItems,
+        totalPrice: totalPrice,
+      });
+
+      // Clear the user's cart after placing the order
+      user.cartItems = [];
+      await user.save();
+
+      res.json({ message: "Order placed successfully", order: newOrder });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to place order", details: error });
+    }
+  });
+  app.get("/orders/:email", async (req, res) => {
+    const { email } = req.params;
+
+    try {
+      // Find the user by their email
+      const user = await UserOfJSM.findOne({ email });
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Fetch the orders of the user
+      const orders = await Order.find({ user: user._id }).populate('items.productId');
+
+      res.json(orders);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to retrieve orders", details: error });
+    }
+  });
+  app.put("/order/:orderId/status", async (req, res) => {
+    const { orderId } = req.params;
+    const { status } = req.body;
+
+    try {
+      // Update the status of the order
+      const order = await Order.findByIdAndUpdate(orderId, { status }, { new: true });
+
+      if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+
+      res.json({ message: "Order status updated", order });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update order", details: error });
+    }
+  });
+  app.delete("/order/:orderId", async (req, res) => {
+    const { orderId } = req.params;
+
+    try {
+      // Delete the order by its ID
+      const order = await Order.findByIdAndDelete(orderId);
+
+      if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+
+      res.json({ message: "Order deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete order", details: error });
+    }
+  });
+
+
 
 
 
