@@ -9,6 +9,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import UserOfJSM from "./models/User.js";
 import Order from "./models/OrderSchema.js";
 import jwt from "jsonwebtoken";
+import adminRoutes from './routes/adminRoutes.js';
 const app = express();
 
 app.use(cookieParser())
@@ -23,6 +24,10 @@ app.use(cors({
     credentials: true,
     origin: ["http://localhost:5173","http://localhost:5174", "https://jsm-contest-fr-1.vercel.app"],
 }));
+
+// Admin routes
+app.use('/api/admin', adminRoutes);
+
 mongoose.connect("mongodb+srv://r11137307:todo_myapp@todo.8yhhs.mongodb.net/?retryWrites=true&w=majority&appName=todo");
 
 
@@ -69,32 +74,41 @@ app.post('/register', async (req, res) => {
 })
 
 app.post('/login', async (req, res) => {
-    const {email, password} = req.body
-    const userDoc = await UserOfJSM.findOne({email})
-    const passOk = bcrypt.compareSync(password, userDoc.password)
-    if(passOk) {
-        //logged in
-        jwt.sign({ email: userDoc.email, id: userDoc._id }, secret, { expiresIn: '1d' }, (err, token) => {
-    if (err) throw err;
-    res.cookie('token', token).json({
-        id: userDoc._id,
-        email: userDoc.email,
+    const {email, password} = req.body;
+    try {
+        const userDoc = await UserOfJSM.findOne({email});
+        if (!userDoc) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
+        const passOk = bcrypt.compareSync(password, userDoc.password);
+        if(passOk) {
+            jwt.sign({ 
+                email: userDoc.email, 
+                id: userDoc._id,
+                role: userDoc.role 
+            }, secret, { expiresIn: '1d' }, (err, token) => {
+                if (err) throw err;
+                res.cookie('token', token).json({
+                    id: userDoc._id,
+                    email: userDoc.email,
+                    role: userDoc.role
+                });
+            });
+        } else {
+            res.status(401).json({ message: 'Invalid credentials' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+app.get('/profile', (req, res) => {
+    const { token } = req.cookies;
+    jwt.verify(token, secret, {}, (err, info) => {
+        if (err) throw err;
+        res.json(info);
     });
 });
 
-
-    } else {
-        res.status(401).json({msg: 'Invalid credentials'}, )
-    }
-
-})
-app.get('/profile', (req, res) => {
-    const {token} = req.cookies;
-    jwt.verify(token, secret, {}, (err, info) => {
-        if(err) throw err
-        res.json(info)
-    })
-})
 const findUserByEmail = async (email) => {
     return await UserOfJSM.findOne({ email:email });
   };
@@ -136,6 +150,8 @@ app.get("/getRetaurants", async (req, res) => {
 
 app.post('/logout', (req, res) => {
     res.cookie('token', '').json('ok')
+    localStorage.removeItem('token');
+
 })
 
 //cart crud operations

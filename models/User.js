@@ -19,7 +19,7 @@ const UsersSchemaOfJsm = new Schema({
   },
   role: {
     type: String,
-    enum: ['user', 'admin'],
+    enum: ['user', 'admin', 'moderator', 'seller'], // updated enum values
     default: 'user',
   },
   profilePic: {
@@ -30,11 +30,10 @@ const UsersSchemaOfJsm = new Schema({
     type: String,
     default: null, // Store Cloudinary public_id for easier deletion
   },
-cartItems: [{
+  cartItems: [{
     productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Food' }, // Example for food items
     quantity: { type: Number, required: true },
   }],
-
   bio: {
     type: String,
     default: 'bio not added',
